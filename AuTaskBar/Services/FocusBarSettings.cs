@@ -7,6 +7,7 @@ namespace AuTaskBar.Services
         public int PomodoroRestMinutes { get; set; } = 5;
         public string? LastMood { get; set; }
         public bool RunAtStartup { get; set; }
+        public bool AnchorToTop { get; set; } = false;
         public double BarOpacity { get; set; } = 0.7;
         public double BarWidth { get; set; } = 1280;
         public double BarHeight { get; set; } = 90;
