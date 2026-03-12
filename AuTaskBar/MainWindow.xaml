@@ -55,6 +55,11 @@
                                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE96D;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
                             </MenuItem.Icon>
                         </MenuItem>
+                        <MenuItem Header="Restablecer posicion" Command="{Binding ResetPositionCommand}">
+                            <MenuItem.Icon>
+                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE777;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem Header="Pass-through (clicks pasan)" IsCheckable="True" IsChecked="{Binding IsClickThrough}" Command="{Binding ToggleClickThroughCommand}">
                             <MenuItem.Icon>
                                 <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8AB;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>

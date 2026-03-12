@@ -26,6 +26,7 @@ namespace AuTaskBar
         private readonly ISettingsService _settingsService = new SettingsService();
         private readonly IStartupService _startupService = new StartupService();
         private readonly Forms.NotifyIcon _trayIcon;
+        private readonly DispatcherTimer _positionPersistTimer;
         private SettingsWindow? _settingsWindow;
         private FocusBarSettings _settings = new FocusBarSettings();
 
@@ -43,6 +44,13 @@ namespace AuTaskBar
 
             InitializeComponent();
 
+            _positionPersistTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+            _positionPersistTimer.Tick += (_, __) =>
+            {
+                _positionPersistTimer.Stop();
+                _settingsService.Save(_settings);
+            };
+
             Loaded += (_, __) => 
             {
                 Dispatcher.BeginInvoke(RefreshMarqueeAnimations, DispatcherPriority.Loaded);
@@ -54,7 +62,13 @@ namespace AuTaskBar
                 if (_settings.AnchorToTop)
                 {
                     SnapToTopCenter();
+                    return;
                 }
+
+                _settings.WindowLeft = Left;
+                _settings.WindowTop = Top;
+                _positionPersistTimer.Stop();
+                _positionPersistTimer.Start();
             };
 
             _settings = _settingsService.Load();
@@ -85,6 +99,7 @@ namespace AuTaskBar
 
             Closed += (_, __) =>
             {
+                _positionPersistTimer.Stop();
                 ViewModel.StopTimers();
                 _trayIcon.Visible = false;
                 _trayIcon.Dispose();
@@ -94,6 +109,7 @@ namespace AuTaskBar
             ViewModel.TogglePinCommand = new RelayCommand(TogglePinnedCore);
             ViewModel.ToggleAnchorTopCommand = new RelayCommand(ToggleAnchorTopCore);
             ViewModel.ToggleClickThroughCommand = new RelayCommand(ToggleClickThroughCore);
+            ViewModel.ResetPositionCommand = new RelayCommand(ResetPositionCore);
             ViewModel.OpenSettingsCommand = new RelayCommand(OpenSettingsCore);
             ViewModel.ExitAppCommand = new RelayCommand(Close);
         }
@@ -124,6 +140,18 @@ namespace AuTaskBar
             {
                 SnapToTopCenter();
             }
+
+            _settingsService.Save(_settings);
+        }
+
+        private void ResetPositionCore()
+        {
+            var workArea = SystemParameters.WorkArea;
+            Left = workArea.Left + ((workArea.Width - Width) / 2.0);
+            Top = workArea.Top;
+
+            _settings.WindowLeft = Left;
+            _settings.WindowTop = Top;
 
             _settingsService.Save(_settings);
         }
@@ -181,6 +209,10 @@ namespace AuTaskBar
             if (_settings.AnchorToTop)
             {
                 SnapToTopCenter();
+            }
+            else
+            {
+                ApplyPersistedPosition();
             }
             
             ViewModel.ApplyVisualTheme(_settings.AppTheme, _settings.AppThemeMode, SurfaceAlphaBoost);
@@ -253,6 +285,21 @@ namespace AuTaskBar
             var workArea = SystemParameters.WorkArea;
             Top = workArea.Top;
             Left = workArea.Left + ((workArea.Width - Width) / 2.0);
+        }
+
+        private void ApplyPersistedPosition()
+        {
+            if (!_settings.WindowLeft.HasValue || !_settings.WindowTop.HasValue)
+            {
+                return;
+            }
+
+            var workArea = SystemParameters.WorkArea;
+            var maxLeft = Math.Max(workArea.Left, workArea.Right - Width);
+            var maxTop = Math.Max(workArea.Top, workArea.Bottom - Height);
+
+            Left = Math.Clamp(_settings.WindowLeft.Value, workArea.Left, maxLeft);
+            Top = Math.Clamp(_settings.WindowTop.Value, workArea.Top, maxTop);
         }
 
         private void TaskTextMarquee_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

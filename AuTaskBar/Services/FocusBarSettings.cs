@@ -8,6 +8,8 @@ namespace AuTaskBar.Services
         public string? LastMood { get; set; }
         public bool RunAtStartup { get; set; }
         public bool AnchorToTop { get; set; } = false;
+        public double? WindowLeft { get; set; }
+        public double? WindowTop { get; set; }
         public double BarOpacity { get; set; } = 0.7;
         public double BarWidth { get; set; } = 1280;
         public double BarHeight { get; set; } = 90;

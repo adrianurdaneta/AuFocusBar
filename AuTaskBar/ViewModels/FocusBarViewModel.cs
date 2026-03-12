@@ -66,6 +66,7 @@ namespace AuTaskBar.ViewModels
         [ObservableProperty] private ICommand? _togglePinCommand;
         [ObservableProperty] private ICommand? _toggleAnchorTopCommand;
         [ObservableProperty] private ICommand? _toggleClickThroughCommand;
+        [ObservableProperty] private ICommand? _resetPositionCommand;
         [ObservableProperty] private ICommand? _openSettingsCommand;
         [ObservableProperty] private ICommand? _exitAppCommand;
 
