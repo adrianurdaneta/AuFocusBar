@@ -29,6 +29,10 @@ namespace AuTaskBar
         private readonly DispatcherTimer _positionPersistTimer;
         private SettingsWindow? _settingsWindow;
         private FocusBarSettings _settings = new FocusBarSettings();
+        private bool _hasPreAnchorState;
+        private double _preAnchorLeft;
+        private double _preAnchorTop;
+        private double _preAnchorWidth;
 
         public FocusBarViewModel ViewModel { get; }
 
@@ -61,7 +65,7 @@ namespace AuTaskBar
             {
                 if (_settings.AnchorToTop)
                 {
-                    SnapToTopCenter();
+                    ApplyAnchoredLayout();
                     return;
                 }
 
@@ -138,7 +142,12 @@ namespace AuTaskBar
 
             if (_settings.AnchorToTop)
             {
-                SnapToTopCenter();
+                CapturePreAnchorState();
+                ApplyAnchoredLayout();
+            }
+            else
+            {
+                RestoreUnanchoredLayout();
             }
 
             _settingsService.Save(_settings);
@@ -208,10 +217,12 @@ namespace AuTaskBar
             ViewModel.IsAnchoredTop = _settings.AnchorToTop;
             if (_settings.AnchorToTop)
             {
-                SnapToTopCenter();
+                CapturePreAnchorState();
+                ApplyAnchoredLayout();
             }
             else
             {
+                Width = barWidth;
                 ApplyPersistedPosition();
             }
             
@@ -252,39 +263,61 @@ namespace AuTaskBar
         }
 
         // --- View Handlers ---
-        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void DragHandleThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            var source = e.OriginalSource as DependencyObject;
-            while (source != null)
-            {
-                if (ReferenceEquals(source, TaskTextMarquee) || ReferenceEquals(source, TaskEditBox)) return;
-                source = VisualTreeHelper.GetParent(source);
-            }
-            if (e.ButtonState == MouseButtonState.Pressed) { try { DragMove(); } catch { } }
-
             if (_settings.AnchorToTop)
             {
-                SnapToTopCenter();
+                return;
             }
+
+            Left += e.HorizontalChange;
+            Top += e.VerticalChange;
         }
 
-        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void DragHandleThumb_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton != MouseButtonState.Pressed) return;
-            if (IsInteractiveElement(e.OriginalSource as DependencyObject)) return;
-            try { DragMove(); } catch { }
-
-            if (_settings.AnchorToTop)
-            {
-                SnapToTopCenter();
-            }
+            ToggleAnchorTopCore();
+            e.Handled = true;
         }
 
-        private void SnapToTopCenter()
+        private void ApplyAnchoredLayout()
         {
             var workArea = SystemParameters.WorkArea;
             Top = workArea.Top;
-            Left = workArea.Left + ((workArea.Width - Width) / 2.0);
+            Left = workArea.Left;
+            Width = workArea.Width;
+        }
+
+        private void CapturePreAnchorState()
+        {
+            if (_hasPreAnchorState)
+            {
+                return;
+            }
+
+            _preAnchorLeft = Left;
+            _preAnchorTop = Top;
+            _preAnchorWidth = Width;
+            _hasPreAnchorState = true;
+        }
+
+        private void RestoreUnanchoredLayout()
+        {
+            Width = _hasPreAnchorState ? _preAnchorWidth : _settings.BarWidth;
+
+            if (_hasPreAnchorState)
+            {
+                Left = _preAnchorLeft;
+                Top = _preAnchorTop;
+            }
+            else
+            {
+                ApplyPersistedPosition();
+            }
+
+            _settings.WindowLeft = Left;
+            _settings.WindowTop = Top;
+            _hasPreAnchorState = false;
         }
 
         private void ApplyPersistedPosition()
@@ -335,17 +368,6 @@ namespace AuTaskBar
         private void Window_StateChanged(object? sender, EventArgs e)
         {
             if (WindowState == WindowState.Maximized) WindowState = WindowState.Normal;
-        }
-
-        private static bool IsInteractiveElement(DependencyObject? obj)
-        {
-            while (obj != null)
-            {
-                if (obj is ButtonBase || obj is TextBoxBase || obj is ComboBox || obj is Slider) return true;
-                if (obj is TextBlock tb && tb.Tag is string) return true;
-                obj = VisualTreeHelper.GetParent(obj);
-            }
-            return false;
         }
 
         private void RefreshMarqueeAnimations()

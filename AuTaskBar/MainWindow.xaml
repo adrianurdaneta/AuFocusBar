@@ -15,212 +15,233 @@
                  ShowInTaskbar="False"
                  ResizeMode="NoResize"
                  FontFamily="Segoe UI Variable Text"
-                 PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
                  StateChanged="Window_StateChanged">
 
-<!-- Simulated glass: gradient + faint border + shadow -->
-<Border CornerRadius="12" Padding="10" SnapsToDevicePixels="True">
-    <Border.Background>
-        <Binding Path="GlassBackgroundBrush"/>
-    </Border.Background>
-    <Border.Effect>
-        <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4"/>
-    </Border.Effect>
+    <Window.Resources>
+        <Style x:Key="DragHandleThumbStyle" TargetType="Thumb">
+            <Setter Property="Width" Value="160"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Cursor" Value="SizeAll"/>
+            <Setter Property="Background" Value="{Binding MenuAccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{Binding BarBorderBrush}"/>
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border CornerRadius="4"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#55000000" BlurRadius="6" ShadowDepth="1"/>
+                            </Border.Effect>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
-    <Border BorderBrush="{Binding BarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8">
-            <Grid Background="#00000055" MouseLeftButtonDown="Grid_MouseLeftButtonDown" >
-                
-                <Grid.ContextMenu>
-                    <ContextMenu x:Name="BarContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" Background="{Binding MenuBackgroundBrush}" Foreground="{Binding MenuTextBrush}" BorderBrush="{Binding MenuBorderBrush}" BorderThickness="1" Padding="4">
-                        <ContextMenu.Resources>
-                            <Style TargetType="MenuItem">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="Foreground" Value="{Binding MenuTextBrush}"/>
-                                <Setter Property="Padding" Value="10,6"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsHighlighted" Value="True">
-                                        <Setter Property="Background" Value="{Binding MenuHoverBrush}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContextMenu.Resources>
+    <!-- Simulated glass: gradient + faint border + shadow -->
+    <Grid ClipToBounds="False">
+    <Border CornerRadius="12" Padding="10" SnapsToDevicePixels="True" Margin="0,4,0,-10">
+            <Border.Background>
+                <Binding Path="GlassBackgroundBrush"/>
+            </Border.Background>
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4"/>
+            </Border.Effect>
 
-                        <MenuItem Header="{Binding PinMenuHeader}" Command="{Binding TogglePinCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE718;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Anclar arriba" IsCheckable="True" IsChecked="{Binding IsAnchoredTop}" Command="{Binding ToggleAnchorTopCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE96D;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Restablecer posicion" Command="{Binding ResetPositionCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE777;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Pass-through (clicks pasan)" IsCheckable="True" IsChecked="{Binding IsClickThrough}" Command="{Binding ToggleClickThroughCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8AB;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="{Binding PomodoroMenuHeader}" Command="{Binding TogglePomodoroCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE121;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <Separator/>
-                        <MenuItem Header="Refrescar tarea" Command="{Binding RefreshTaskCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE72C;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Refrescar reunion" Command="{Binding RefreshMeetingCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE787;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Nueva English Pill" Command="{Binding NewPillCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE734;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Configuracion..." Command="{Binding OpenSettingsCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE713;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <Separator/>
-                        <MenuItem Header="Salir" Command="{Binding ExitAppCommand}">
-                            <MenuItem.Icon>
-                                <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8BB;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </Grid.ContextMenu>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.5*" />
-                    <ColumnDefinition Width="7*" />
-                    <ColumnDefinition Width="1.5*" />
-                </Grid.ColumnDefinitions>
+            <Border BorderBrush="{Binding BarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8">
+                <Grid Background="#00000055">
 
-                <!-- Left panel: fecha y horas -->
-                <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,0,0">
-                    <TextBlock Text="{Binding DateText}" Foreground="{Binding SecondaryTextBrush}" FontSize="18" HorizontalAlignment="Center" TextAlignment="Center"/>
-
-                    <Grid Margin="0,2,0,0" HorizontalAlignment="Center">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <Image Grid.Row="0" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/es.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LocalTimeMadrid}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DayNightIconEsp}" Foreground="{Binding DayNightIconBrushEsp}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-
-                        <Image Grid.Row="1" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/ve.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TimeVZLA}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DayNightIconVen}" Foreground="{Binding DayNightIconBrushVen}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </Grid>
-                </StackPanel>
-
-                <!-- Centro: tarea y proxima reunion alineadas entre si -->
-                <Border x:Name="TaskViewport" Grid.Row="0" Grid.Column="1" ClipToBounds="True" HorizontalAlignment="Stretch" Margin="14,0,14,0">
-                    <Grid>
-                        <TextBlock x:Name="TaskTextMarquee" Text="{Binding TaskText}" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   FontSize="26" Foreground="{Binding PrimaryTextBrush}" FontWeight="SemiBold" TextTrimming="None" RenderTransformOrigin="0,0.5" PreviewMouseLeftButtonDown="TaskTextMarquee_MouseLeftButtonDown">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                    <Grid.ContextMenu>
+                        <ContextMenu x:Name="BarContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}" Background="{Binding MenuBackgroundBrush}" Foreground="{Binding MenuTextBrush}" BorderBrush="{Binding MenuBorderBrush}" BorderThickness="1" Padding="4">
+                            <ContextMenu.Resources>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="{Binding MenuTextBrush}"/>
+                                    <Setter Property="Padding" Value="10,6"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsTaskEditing}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter Property="Background" Value="{Binding MenuHoverBrush}"/>
+                                        </Trigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <TextBox x:Name="TaskEditBox" Text="{Binding TaskEditText, UpdateSourceTrigger=PropertyChanged}"
+                            </ContextMenu.Resources>
+
+                            <MenuItem Header="{Binding PinMenuHeader}" Command="{Binding TogglePinCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE718;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Anclar arriba" IsCheckable="True" IsChecked="{Binding IsAnchoredTop}" Command="{Binding ToggleAnchorTopCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE96D;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Restablecer posicion" Command="{Binding ResetPositionCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE777;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Pass-through (clicks pasan)" IsCheckable="True" IsChecked="{Binding IsClickThrough}" Command="{Binding ToggleClickThroughCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8AB;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="{Binding PomodoroMenuHeader}" Command="{Binding TogglePomodoroCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE121;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator/>
+                            <MenuItem Header="Refrescar tarea" Command="{Binding RefreshTaskCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE72C;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Refrescar reunion" Command="{Binding RefreshMeetingCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE787;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Nueva English Pill" Command="{Binding NewPillCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE734;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Configuracion..." Command="{Binding OpenSettingsCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE713;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator/>
+                            <MenuItem Header="Salir" Command="{Binding ExitAppCommand}">
+                                <MenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8BB;" FontSize="14" Foreground="{Binding MenuAccentBrush}"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Grid.ContextMenu>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*" />
+                        <ColumnDefinition Width="7*" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left panel: fecha y horas -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock Text="{Binding DateText}" Foreground="{Binding SecondaryTextBrush}" FontSize="18" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                        <Grid Margin="0,2,0,0" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Image Grid.Row="0" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/es.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LocalTimeMadrid}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DayNightIconEsp}" Foreground="{Binding DayNightIconBrushEsp}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+
+                            <Image Grid.Row="1" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/ve.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TimeVZLA}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DayNightIconVen}" Foreground="{Binding DayNightIconBrushVen}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Centro: tarea y proxima reunion alineadas entre si -->
+                    <Border x:Name="TaskViewport" Grid.Row="0" Grid.Column="1" ClipToBounds="True" HorizontalAlignment="Stretch" Margin="14,0,14,0">
+                        <Grid>
+                            <TextBlock x:Name="TaskTextMarquee" Text="{Binding TaskText}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   FontSize="26" Foreground="{Binding PrimaryTextBrush}" FontWeight="SemiBold" TextTrimming="None" RenderTransformOrigin="0,0.5" PreviewMouseLeftButtonDown="TaskTextMarquee_MouseLeftButtonDown">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTaskEditing}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBox x:Name="TaskEditBox" Text="{Binding TaskEditText, UpdateSourceTrigger=PropertyChanged}"
                                  VerticalAlignment="Center" HorizontalAlignment="Stretch"
                                  FontSize="24" FontWeight="SemiBold"
                                  Foreground="{Binding PrimaryTextBrush}"
                                  Background="#22000000" BorderBrush="{Binding BarBorderBrush}"
                                  KeyDown="TaskEditBox_KeyDown">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsTaskEditing}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                    </Grid>
-                </Border>
-                <Border x:Name="NextViewport" Grid.Row="1" Grid.Column="1" ClipToBounds="True" HorizontalAlignment="Stretch" Margin="14,0,14,0">
-                    <TextBlock x:Name="NextTextMarquee" Text="{Binding NextMeetingText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding SecondaryTextBrush}" FontSize="16" TextTrimming="None" RenderTransformOrigin="0,0.5"/>
-                </Border>
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTaskEditing}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="NextViewport" Grid.Row="1" Grid.Column="1" ClipToBounds="True" HorizontalAlignment="Stretch" Margin="14,0,14,0">
+                        <TextBlock x:Name="NextTextMarquee" Text="{Binding NextMeetingText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding SecondaryTextBrush}" FontSize="16" TextTrimming="None" RenderTransformOrigin="0,0.5"/>
+                    </Border>
 
-                <!-- Vertical separators -->
-                <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Background="{Binding SeparatorBrush}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Width="1" Background="{Binding SeparatorBrush}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                <!-- Right panel: pomodoro + pill in one container to avoid clipping -->
-                <Grid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Width="Auto" Height="70" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="15,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="2*"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0" Margin="0,0,3,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="8*"/>
-                            <ColumnDefinition Width="15*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- Vertical separators -->
+                    <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="1" Background="{Binding SeparatorBrush}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                    <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Width="1" Background="{Binding SeparatorBrush}" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                    <!-- Right panel: pomodoro + pill in one container to avoid clipping -->
+                    <Grid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Width="Auto" Height="70" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="15,0,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="2*"/>
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Grid.Column="0" Width="25" Height="25" CornerRadius="12.5" Background="{Binding PomodoroBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Pomodoro state"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,15,0" Text="{Binding PomodoroRemaining}" Foreground="{Binding PrimaryTextBrush}" FontSize="30" FontWeight="SemiBold" FontFamily="Consolas" TextAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                        <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Value="{Binding PomodoroProgressPercentage}" Maximum="100" Height="6" Margin="0,3,0,0" VerticalAlignment="Top"/>
+                        <Grid Grid.Row="0" Margin="0,0,3,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="8*"/>
+                                <ColumnDefinition Width="15*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Grid.Column="0" Width="25" Height="25" CornerRadius="12.5" Background="{Binding PomodoroBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Pomodoro state"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,0,15,0" Text="{Binding PomodoroRemaining}" Foreground="{Binding PrimaryTextBrush}" FontSize="30" FontWeight="SemiBold" FontFamily="Consolas" TextAlignment="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                            <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Value="{Binding PomodoroProgressPercentage}" Maximum="100" Height="6" Margin="0,3,0,0" VerticalAlignment="Top"/>
+                        </Grid>
+
+                        <TextBlock Grid.Row="1" Text="{Binding DailyEnglish}" Foreground="{Binding SecondaryTextBrush}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Width="170" TextAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding DailyEnglish}"/>
                     </Grid>
 
-                    <TextBlock Grid.Row="1" Text="{Binding DailyEnglish}" Foreground="{Binding SecondaryTextBrush}" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center" Width="170" TextAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding DailyEnglish}"/>
+                    <!-- Controls moved to context menu on right click -->
+
                 </Grid>
-
-                <!-- Controls moved to context menu on right click -->
-
-            </Grid>
+            </Border>
         </Border>
-    </Border>
+
+        <Thumb Style="{StaticResource DragHandleThumbStyle}"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Top"
+           Margin="0,0,0,0"
+           DragDelta="DragHandleThumb_DragDelta"
+           MouseDoubleClick="DragHandleThumb_MouseDoubleClick"/>
+    </Grid>
 </Window>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
