@@ -121,11 +121,11 @@
 
                         <Image Grid.Row="0" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/es.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LocalTimeMadrid}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DayNightIconEsp}" Foreground="{Binding DayNightIconBrushEsp}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DayNightIconEsp}" Foreground="{Binding DayNightIconBrushEsp}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
 
                         <Image Grid.Row="1" Grid.Column="0" Source="pack://siteoforigin:,,,/Assets/flags/ve.png" Width="20" Height="14" Stretch="Uniform" Margin="0,2,0,2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TimeVZLA}" FontWeight="SemiBold" FontSize="21" Foreground="{Binding PrimaryTextBrush}" Margin="10,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DayNightIconVen}" Foreground="{Binding DayNightIconBrushVen}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DayNightIconVen}" Foreground="{Binding DayNightIconBrushVen}" FontFamily="Segoe UI Symbol" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
                 </StackPanel>
 
