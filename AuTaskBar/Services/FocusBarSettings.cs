@@ -2,6 +2,7 @@ namespace AuTaskBar.Services
 {
     public class FocusBarSettings
     {
+        public int SchemaVersion { get; set; } = 1;
         public bool Pinned { get; set; }
         public int PomodoroFocusMinutes { get; set; } = 25;
         public int PomodoroRestMinutes { get; set; } = 5;
